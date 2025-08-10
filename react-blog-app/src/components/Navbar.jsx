@@ -29,12 +29,18 @@
 //   );
 // }
 
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import React from "react";
+import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store/slices/authSlice";
 
-export default function Navbar(){
-  const token = useSelector(state => state.auth.token)
+export default function Navbar() {
+  const token = useSelector((s) => s.auth.token);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <nav className="bg-white shadow">
@@ -58,6 +64,7 @@ export default function Navbar(){
             <>
               <Link to="/create" className="px-3 py-2 bg-indigo-600 text-white rounded">Create</Link>
               <Link to="/profile" className="px-3 py-2 border rounded">Profile</Link>
+              <button onClick={handleLogout} className="px-3 py-2 text-sm rounded border">Logout</button>
             </>
           ) : (
             <Link to="/login" className="px-3 py-2 bg-indigo-600 text-white rounded">Login / Get started</Link>
@@ -65,5 +72,5 @@ export default function Navbar(){
         </div>
       </div>
     </nav>
-  )
+  );
 }

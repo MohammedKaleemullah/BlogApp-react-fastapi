@@ -61,6 +61,7 @@ import CreatePost from './pages/CreatePost'
 import PostDetail from './pages/PostDetail'
 import Profile from './pages/Profile'
 import Navbar from './components/Navbar'
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -73,6 +74,20 @@ export default function App() {
           <Route path="/create" element={<CreatePost />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/post/:id" element={<PostDetail />} />
+          <Route path="/create" element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
         </Routes>
       </main>
     </div>
