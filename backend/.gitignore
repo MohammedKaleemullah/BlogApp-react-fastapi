@@ -1,0 +1,12 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore uploads folder if not needed in repo
+uploads/
+
+# Environment variable files
+.env
+
+# IDE folders
+.vscode/
