@@ -8,7 +8,7 @@ router = APIRouter(prefix="/upload", tags=["Upload"])
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif","webp", "svg"}
 
 def allowed_file(filename: str):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
