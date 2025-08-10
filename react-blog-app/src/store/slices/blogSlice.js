@@ -1,36 +1,68 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import api from '../../services/api'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-export const fetchBlogs = createAsyncThunk('blogs/fetch', async ({ limit=10, offset=0, tags, visibility='public' } = {}, { rejectWithValue }) => {
-  try {
-    const params = { limit, offset, visibility }
-    if (tags) params.tags = tags
-    const res = await api.get('/blogs', { params })
-    return res.data
-  } catch (err) {
-    return rejectWithValue(err.response?.data || err.message)
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+export const fetchBlogs = createAsyncThunk(
+  "blogs/fetchBlogs",
+  async ({ offset = 0, limit = 10, tags, visibility }, { rejectWithValue }) => {
+    try {
+      const params = { limit, offset };
+      if (tags) params.tags = tags;
+      if (visibility) params.visibility = visibility;
+
+      const res = await axios.get(`${API_BASE}/blogs`, { params });
+      // Backend returns an array directly
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
   }
-})
+);
 
 const blogSlice = createSlice({
-  name: 'blogs',
-  initialState: { items: [], loading: false, error: null, hasMore: true },
+  name: "blogs",
+  initialState: {
+    items: [],
+    offset: 0,
+    limit: 10,
+    hasMore: true,
+    loading: false,
+    error: null,
+  },
   reducers: {
-    clearBlogs(state){ state.items = []; state.hasMore = true }
+    resetBlogs: (state) => {
+      state.items = [];
+      state.offset = 0;
+      state.hasMore = true;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBlogs.pending, (state) => { state.loading = true; state.error = null })
+      .addCase(fetchBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchBlogs.fulfilled, (state, action) => {
-        state.loading = false
-        if (!action.payload || action.payload.length === 0) state.hasMore = false
-        state.items = [...state.items, ...action.payload]
+        state.loading = false;
+
+        const newItems = Array.isArray(action.payload) ? action.payload : [];
+
+        // Filter out duplicates based on blog ID
+        const uniqueNewItems = newItems.filter(
+          (blog) => !state.items.some((b) => b.id === blog.id)
+        );
+
+        state.items = [...state.items, ...uniqueNewItems];
+        state.hasMore = uniqueNewItems.length > 0;
+        state.offset += state.limit; // increment offset for next request
       })
       .addCase(fetchBlogs.rejected, (state, action) => {
-        state.loading = false; state.error = action.payload
-      })
-  }
-})
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch blogs";
+      });
+  },
+});
 
-export const { clearBlogs } = blogSlice.actions
-export default blogSlice.reducer
+export const { resetBlogs } = blogSlice.actions;
+export default blogSlice.reducer;

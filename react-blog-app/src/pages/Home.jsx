@@ -59,11 +59,75 @@
 //     </div>
 //   );
 // }
+import React, { useEffect, useRef, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBlogs } from "../store/slices/blogSlice";
+import { Link } from "react-router-dom";
 
 export default function Home() {
+  const dispatch = useDispatch();
+  const { items, loading, hasMore, offset, limit, error } = useSelector((s) => s.blogs);
+  const observer = useRef();
+
+  const lastBlogRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          dispatch(fetchBlogs({ offset, limit, visibility: "public" }));
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, offset, limit, dispatch]
+  );
+
+  // Initial fetch
+  useEffect(() => {
+    if (items.length === 0) {
+      dispatch(fetchBlogs({ offset: 0, limit, visibility: "public" }));
+    }
+  }, [dispatch, items.length, limit]);
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold">Welcome to the Blog App</h1>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">Latest Blogs</h1>
+
+      {items.map((blog, index) => {
+        if (index === items.length - 1) {
+          return (
+            <div
+              key={blog.id}
+              ref={lastBlogRef}
+              className="mb-4 p-4 border rounded shadow-sm"
+            >
+              <Link to={`/post/${blog.id}`}>
+                <h2 className="text-lg font-semibold">{blog.title}</h2>
+              </Link>
+              <p className="text-sm text-gray-600">
+                {blog.summary || blog.content?.slice(0, 100) + "..."}
+              </p>
+            </div>
+          );
+        }
+        return (
+          <div key={blog.id} className="mb-4 p-4 border rounded shadow-sm">
+            <Link to={`/post/${blog.id}`}>
+              <h2 className="text-lg font-semibold">{blog.title}</h2>
+            </Link>
+            <p className="text-sm text-gray-600">
+              {blog.summary || blog.content?.slice(0, 100) + "..."}
+            </p>
+          </div>
+        );
+      })}
+
+      {loading && <div className="text-center py-4">Loading...</div>}
+      {error && <div className="text-red-500 py-4 text-center">{error}</div>}
+      {!hasMore && !loading && (
+        <div className="text-center text-gray-500 py-4">No more blogs</div>
+      )}
     </div>
   );
 }
