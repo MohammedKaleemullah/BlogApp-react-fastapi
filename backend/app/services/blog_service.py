@@ -9,6 +9,9 @@ from sqlalchemy.dialects.postgresql import array
 
 from app.core.sanitizer import sanitize_html
 
+from sqlalchemy import desc
+
+
 def is_valid_image_url(url: Optional[str]) -> bool:
     if url is None:
         return True
@@ -56,6 +59,8 @@ def get_blogs(
 
     if tags:
         query = query.filter(Blog.tags.overlap(array(tags, type_=String)))
+
+    query = query.order_by(desc(Blog.created_at))
 
     return query.offset(offset).limit(limit).all()
 
