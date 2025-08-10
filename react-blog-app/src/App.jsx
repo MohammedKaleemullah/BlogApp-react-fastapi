@@ -38,21 +38,6 @@
 // export default App;
 
 
-// import React from 'react'
-// import { Routes, Route } from 'react-router-dom'
-// import Home from './pages/Home'
-// import Login from './pages/Login'
-// import CreatePost from './pages/CreatePost'
-// import PostDetail from './pages/PostDetail'
-// import Profile from './pages/Profile'
-// import Navbar from './components/Navbar'
-
-
-// import LoginPage from "./pages/Login"
-// import HomePage from "./pages/Home"
-
-// import ProtectedRoute from "./components/ProtectedRoute";
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -62,6 +47,7 @@ import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import ProtectedRoute from "./components/ProtectedRoute";
 import BlogDetails from "./pages/BlogDetails";
+
 
 export default function App() {
   return (

@@ -1,15 +1,3 @@
-// // import { LoginForm } from "../components/LoginForm";
-
-// export default function Login() {
-//   return (
-//     <div className="flex min-h-screen items-center justify-center">
-//       {/* <LoginForm /> */}
-//     </div>
-//   );
-// }
-
-
-
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slices/authSlice";
@@ -23,7 +11,6 @@ export default function Login() {
 
   const [form, setForm] = useState({ username: "", password: "" });
 
-  // redirect if already logged in
   useEffect(() => {
     if (token) {
       const from = location.state?.from?.pathname || "/";
@@ -38,12 +25,9 @@ export default function Login() {
     e.preventDefault();
     if (!form.username || !form.password) return;
     try {
-      // unwrap will throw on rejection so you can catch here (optional)
       await dispatch(login({ username: form.username, password: form.password })).unwrap();
-      // navigate is handled by useEffect, but we can also redirect explicitly
       navigate("/", { replace: true });
     } catch (err) {
-      // error stored in slice — nothing extra needed here
       console.error("Login failed:", err);
     }
   };
@@ -100,4 +84,5 @@ export default function Login() {
     </div>
   );
 }
+
 

@@ -10,6 +10,12 @@ export default function BlogDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getFullUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `${API_BASE}${url}`;
+  };
+
   useEffect(() => {
     async function fetchBlog() {
       try {
@@ -30,51 +36,57 @@ export default function BlogDetails() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      {/* Title */}
-      <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
+      <h2 className="text-4xl font-bold mb-4">{blog.title}</h2>
 
-      {/* Metadata */}
       <div className="flex flex-wrap items-center text-sm text-gray-500 mb-4 gap-4">
         <span>Author ID: {blog.user_id}</span>
-        <span>Visibility: 
-          <span className={`ml-1 font-medium ${blog.visibility === "public" ? "text-green-600" : "text-yellow-600"}`}>
+        <span>
+          Visibility:{" "}
+          <span
+            className={`ml-1 font-medium ${
+              blog.visibility === "public" ? "text-green-600" : "text-yellow-600"
+            }`}
+          >
             {blog.visibility}
           </span>
         </span>
         <span>Created: {new Date(blog.created_at).toLocaleString()}</span>
       </div>
 
-      {/* Deleted warning */}
       {blog.is_deleted && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
           ⚠ This blog has been marked as deleted.
         </div>
       )}
 
-      {/* Main Image */}
-      {blog.main_image_url && blog.main_image_url !== "string" && (
-        <img
-          src={blog.main_image_url}
-          alt={blog.title}
-          className="mb-6 w-full max-h-96 object-cover rounded shadow"
-        />
-      )}
+      <div className="flex flex-col md:flex-row gap-6 mb-6">
 
-      {/* Sub Images */}
-      {blog.sub_images && blog.sub_images.length > 0 && (
+        {blog.main_image_url && blog.main_image_url !== "string" && (
+          <img
+            src={getFullUrl(blog.main_image_url)}
+            alt={blog.title}
+            className="md:w-1/3 w-full max-h-96 object-cover rounded shadow"
+          />
+        )}
+
+        <div className="md:w-2/3 prose max-w-none text-gray-800 whitespace-pre-line">
+          {blog.content}
+        </div>
+      </div>
+
+      {/* {blog.sub_images && blog.sub_images.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           {blog.sub_images.map((img, idx) => (
             <img
               key={idx}
-              src={img}
+              src={getFullUrl(img)}
               alt={`Sub ${idx + 1}`}
-              className="w-full h-48 object-cover rounded shadow"
+              className="max-h-48 object-cover rounded shadow"
             />
           ))}
         </div>
-      )}
+      )} */}
 
-      {/* Tags */}
       {blog.tags && blog.tags.length > 0 && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Tags</h3>
@@ -91,12 +103,6 @@ export default function BlogDetails() {
         </div>
       )}
 
-      {/* Content */}
-      <div className="prose max-w-none text-gray-800 mb-8 whitespace-pre-line">
-        {blog.content}
-      </div>
-
-      {/* Back button */}
       <div>
         <Link
           to="/"

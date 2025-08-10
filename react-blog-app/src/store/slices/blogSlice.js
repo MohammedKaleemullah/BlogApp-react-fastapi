@@ -3,7 +3,6 @@ import axios from "axios";
 
 const API_BASE = "http://127.0.0.1:8000";
 
-// Fetch all blogs
 export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
   async ({ offset, limit, visibility }) => {
@@ -14,7 +13,6 @@ export const fetchBlogs = createAsyncThunk(
   }
 );
 
-// Fetch single blog
 export const fetchBlogById = createAsyncThunk(
   "blogs/fetchBlogById",
   async (id, { rejectWithValue }) => {
@@ -59,7 +57,6 @@ const blogSlice = createSlice({
         state.loading = false;
         const newItems = Array.isArray(action.payload) ? action.payload : [];
 
-        // ✅ Filter out duplicates by ID
         const existingIds = new Set(state.items.map((b) => b.id));
         const uniqueItems = newItems.filter((b) => !existingIds.has(b.id));
 

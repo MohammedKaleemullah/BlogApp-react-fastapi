@@ -7,8 +7,8 @@ export default function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (!token) {
-    // redirect to login and save current location
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children;
 }
+
