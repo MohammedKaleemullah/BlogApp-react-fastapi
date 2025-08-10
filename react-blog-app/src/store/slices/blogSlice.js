@@ -1,18 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
+// Fetch all blogs
 export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
-  async ({ offset = 0, limit = 10, tags, visibility }, { rejectWithValue }) => {
-    try {
-      const params = { limit, offset };
-      if (tags) params.tags = tags;
-      if (visibility) params.visibility = visibility;
+  async ({ offset, limit, visibility }) => {
+    const res = await fetch(
+      `${API_BASE}/blogs?limit=${limit}&offset=${offset}&visibility=${visibility}`
+    );
+    return await res.json();
+  }
+);
 
-      const res = await axios.get(`${API_BASE}/blogs`, { params });
-      // Backend returns an array directly
+// Fetch single blog
+export const fetchBlogById = createAsyncThunk(
+  "blogs/fetchBlogById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_BASE}/blogs/${id}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -24,6 +31,8 @@ const blogSlice = createSlice({
   name: "blogs",
   initialState: {
     items: [],
+    blogDetails: null,
+    total: 0,
     offset: 0,
     limit: 10,
     hasMore: true,
@@ -35,34 +44,49 @@ const blogSlice = createSlice({
       state.items = [];
       state.offset = 0;
       state.hasMore = true;
+      state.total = 0;
+    },
+    clearBlogDetails: (state) => {
+      state.blogDetails = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBlogs.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(fetchBlogs.fulfilled, (state, action) => {
         state.loading = false;
-
         const newItems = Array.isArray(action.payload) ? action.payload : [];
 
-        // Filter out duplicates based on blog ID
-        const uniqueNewItems = newItems.filter(
-          (blog) => !state.items.some((b) => b.id === blog.id)
-        );
+        // ✅ Filter out duplicates by ID
+        const existingIds = new Set(state.items.map((b) => b.id));
+        const uniqueItems = newItems.filter((b) => !existingIds.has(b.id));
 
-        state.items = [...state.items, ...uniqueNewItems];
-        state.hasMore = uniqueNewItems.length > 0;
-        state.offset += state.limit; // increment offset for next request
+        state.items = [...state.items, ...uniqueItems];
+        state.hasMore = newItems.length > 0;
+        if (uniqueItems.length > 0) {
+          state.offset += state.limit;
+        }
       })
       .addCase(fetchBlogs.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch blogs";
+        state.error = action.error.message;
+      })
+      .addCase(fetchBlogById.pending, (state) => {
+        state.loading = true;
+        state.blogDetails = null;
+      })
+      .addCase(fetchBlogById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.blogDetails = action.payload;
+      })
+      .addCase(fetchBlogById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { resetBlogs } = blogSlice.actions;
+export const { resetBlogs, clearBlogDetails } = blogSlice.actions;
 export default blogSlice.reducer;

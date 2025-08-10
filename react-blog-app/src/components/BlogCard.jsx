@@ -9,7 +9,7 @@ import {
 
 function BlogCard({ id, title, content, author }) {
   return (
-    <Link to={`/post/${id}`} className="block">
+    <Link to={`/blogs/${id}`} className="block">
       <Card className="shadow-md hover:shadow-xl transition duration-300 ">
         <CardHeader>
           <CardTitle className="text-lg line-clamp-1">{title}</CardTitle>

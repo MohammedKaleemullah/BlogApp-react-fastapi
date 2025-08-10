@@ -1,4 +1,3 @@
-# app/services/blog_service.py
 from sqlalchemy.orm import Session
 from app.models.blog import Blog
 from app.schemas.blog import BlogCreate, BlogOut, BlogUpdate

@@ -59,36 +59,41 @@
 //     </div>
 //   );
 // }
-import React, { useEffect, useRef, useCallback } from "react";
+
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBlogs } from "../store/slices/blogSlice";
+import { fetchBlogs } from "@/store/slices/blogSlice";
 import { Link } from "react-router-dom";
 
 export default function Home() {
   const dispatch = useDispatch();
   const { items, loading, hasMore, offset, limit, error } = useSelector((s) => s.blogs);
   const observer = useRef();
+  const [initialLoaded, setInitialLoaded] = useState(false); // ✅ Prevent double fetch
 
   const lastBlogRef = useCallback(
     (node) => {
-      if (loading) return;
+      if (loading) return; // Prevent firing while loading
       if (observer.current) observer.current.disconnect();
+
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           dispatch(fetchBlogs({ offset, limit, visibility: "public" }));
         }
       });
+
       if (node) observer.current.observe(node);
     },
     [loading, hasMore, offset, limit, dispatch]
   );
 
-  // Initial fetch
+  // Initial fetch (only once)
   useEffect(() => {
-    if (items.length === 0) {
+    if (!initialLoaded) {
       dispatch(fetchBlogs({ offset: 0, limit, visibility: "public" }));
+      setInitialLoaded(true);
     }
-  }, [dispatch, items.length, limit]);
+  }, [dispatch, limit, offset, initialLoaded]);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -102,7 +107,7 @@ export default function Home() {
               ref={lastBlogRef}
               className="mb-4 p-4 border rounded shadow-sm"
             >
-              <Link to={`/post/${blog.id}`}>
+              <Link to={`/blogs/${blog.id}`}>
                 <h2 className="text-lg font-semibold">{blog.title}</h2>
               </Link>
               <p className="text-sm text-gray-600">
@@ -113,7 +118,7 @@ export default function Home() {
         }
         return (
           <div key={blog.id} className="mb-4 p-4 border rounded shadow-sm">
-            <Link to={`/post/${blog.id}`}>
+            <Link to={`/blogs/${blog.id}`}>
               <h2 className="text-lg font-semibold">{blog.title}</h2>
             </Link>
             <p className="text-sm text-gray-600">

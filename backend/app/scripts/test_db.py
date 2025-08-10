@@ -1,4 +1,3 @@
-# app/scripts/test_db.py
 from app.database.db_connect import SessionLocal
 from app.models.user import User
 from app.models.blog import Blog

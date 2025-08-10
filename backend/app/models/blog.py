@@ -1,4 +1,3 @@
-# app/models/blog.py
 from sqlalchemy import Column, String, Boolean, TIMESTAMP, Text, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 from app.database.db_connect import Base

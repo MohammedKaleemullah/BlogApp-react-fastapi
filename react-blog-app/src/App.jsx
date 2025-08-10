@@ -53,15 +53,15 @@
 
 // import ProtectedRoute from "./components/ProtectedRoute";
 
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import CreatePost from './pages/CreatePost'
-import PostDetail from './pages/PostDetail'
-import Profile from './pages/Profile'
-import Navbar from './components/Navbar'
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import CreatePost from './pages/CreatePost';
+import Profile from './pages/Profile';
+import Navbar from './components/Navbar';
 import ProtectedRoute from "./components/ProtectedRoute";
+import BlogDetails from "./pages/BlogDetails";
 
 export default function App() {
   return (
@@ -71,25 +71,25 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/create" element={<CreatePost />} />
-          <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/profile" element={<Profile />} />
-
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/create" element={
-            <ProtectedRoute>
-              <CreatePost />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <CreatePost />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/blogs/:id" element={<BlogDetails />} />
         </Routes>
       </main>
     </div>
-  )
+  );
 }
