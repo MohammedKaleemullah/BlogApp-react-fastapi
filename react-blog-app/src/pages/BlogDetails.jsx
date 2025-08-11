@@ -65,7 +65,7 @@ export default function BlogDetails() {
           <img
             src={getFullUrl(blog.main_image_url)}
             alt={blog.title}
-            className="md:w-1/3 w-full max-h-96 object-cover rounded shadow"
+            className="md:w-1/3 w-full max-h-96 object-fill rounded shadow"
           />
         )}
 
