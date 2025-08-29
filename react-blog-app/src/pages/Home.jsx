@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogs } from "@/store/slices/blogSlice";
 import { Link } from "react-router-dom";
 
-export default function Home() {
+export default function Home({ searchQuery }) {
   const dispatch = useDispatch();
   const { items, loading, hasMore, offset, limit, error } = useSelector((s) => s.blogs);
   const observer = useRef();
-  const [initialLoaded, setInitialLoaded] = useState(false);
+  const [initialLoaded, setInitialLoaded] = React.useState(false);
 
   const lastBlogRef = useCallback(
     (node) => {
@@ -32,12 +32,20 @@ export default function Home() {
     }
   }, [dispatch, limit, offset, initialLoaded]);
 
+  const filteredBlogs = items.filter(
+    (blog) =>
+      // blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      // blog.content.toLowerCase().includes(searchQuery.toLowerCase())
+      blog.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto px-4 py-6">
       <h2 className="text-2xl font-bold mb-6">Latest Blogs</h2>
 
-      {items.map((blog, index) => {
-        if (index === items.length - 1) {
+      {filteredBlogs.map((blog, index) => {
+        if (index === filteredBlogs.length - 1) {
           return (
             <div
               key={blog.id}

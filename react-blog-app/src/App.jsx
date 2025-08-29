@@ -38,24 +38,26 @@
 // export default App;
 
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import CreatePost from './pages/CreatePost';
-import Profile from './pages/Profile';
-import Navbar from './components/Navbar';
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import CreatePost from "./pages/CreatePost";
+import Profile from "./pages/Profile";
+import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BlogDetails from "./pages/BlogDetails";
 
 
 export default function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <>
+      <Navbar onSearch={setSearchQuery} />
       <main className="container mx-auto px-4 py-6">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home searchQuery={searchQuery} />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/create"
@@ -76,6 +78,6 @@ export default function App() {
           <Route path="/blogs/:id" element={<BlogDetails />} />
         </Routes>
       </main>
-    </div>
+    </>
   );
 }

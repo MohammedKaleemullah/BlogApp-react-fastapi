@@ -1,18 +1,18 @@
-# fastapi
-# psycopg2-binary
-# uvicorn[standard]
-# dotenv
+fastapi
+psycopg2-binary
+uvicorn[standard]
+dotenv
 
-# sqlalchemy
-# pydantic
+sqlalchemy
+pydantic
 
 
-# pydantic[email]
-# python-jose[cryptography]
-# passlib[bcrypt]
+pydantic[email]
+python-jose[cryptography]
+passlib[bcrypt]
 
-# bleach
-# json_log_formatter
-# pytest
-# httpx
-# tinycss2
+bleach
+json_log_formatter
+pytest
+httpx
+tinycss2
