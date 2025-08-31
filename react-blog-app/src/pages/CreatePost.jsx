@@ -154,17 +154,26 @@ const CreatePost = () => {
         {error && <div className="text-red-600">{error}</div>}
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loadingSubmit}
-          className={`px-3 py-2 rounded text-white ${
-            loadingSubmit
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-gray-800 hover:bg-gray-900 transition"
-          }`}
-        >
-          {loadingSubmit ? "Creating..." : "Create Blog"}
-        </button>
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loadingSubmit}
+                className={`w-full py-4 rounded-xl text-white font-semibold text-lg shadow-lg transition-all duration-200 transform ${
+                  loadingSubmit
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-800 hover:to-gray-600 hover:scale-105 hover:shadow-xl"
+                }`}
+              >
+                {loadingSubmit ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Creating Your Blog...
+                  </div>
+                ) : (
+                  "Create Blog ✨"
+                )}
+              </button>
+            </div>
       </form>
     </div>
   );
