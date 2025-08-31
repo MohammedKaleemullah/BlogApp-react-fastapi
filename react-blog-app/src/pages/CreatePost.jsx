@@ -99,6 +99,7 @@ const CreatePost = () => {
           touched={touched.title}
           setTouched={(val) => setTouched((t) => ({ ...t, title: val }))}
           minLength={10}
+          maxLength={150}
         />
         <TextAreaInput
           label="Content"

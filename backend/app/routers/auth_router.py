@@ -23,5 +23,5 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
     user = user_service.get_user_by_username(db, user_data.username)
     if not user or not verify_password(user_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid USERNAME or password")
-    access_token = create_access_token({"sub": str(user.id)}, expires_delta=timedelta(minutes=30))
+    access_token = create_access_token({"sub": str(user.id)}, expires_delta=timedelta(minutes=720))
     return {"access_token": access_token, "token_type": "bearer"}
