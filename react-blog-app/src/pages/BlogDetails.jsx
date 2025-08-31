@@ -58,34 +58,23 @@ export default function BlogDetails() {
           ⚠ This blog has been marked as deleted.
         </div>
       )}
-
-      <div className="flex flex-col md:flex-row gap-6 mb-6">
-
+      
+      <div className="mb-6">
         {blog.main_image_url && blog.main_image_url !== "string" && (
           <img
             src={getFullUrl(blog.main_image_url)}
             alt={blog.title}
-            className="md:w-1/3 w-full max-h-96 object-fill rounded shadow"
+            className="float-left w-full md:w-1/3 md:max-w-sm max-h-96 object-cover rounded shadow mr-0 md:mr-6 mb-4"
           />
         )}
-
-        <div className="md:w-2/3 prose max-w-none text-gray-800 whitespace-pre-line">
+        
+        <div className="prose max-w-none text-gray-800 whitespace-pre-line text-justify">
           {blog.content}
         </div>
+        
+        {/* Clear float */}
+        <div className="clear-both"></div>
       </div>
-
-      {/* {blog.sub_images && blog.sub_images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          {blog.sub_images.map((img, idx) => (
-            <img
-              key={idx}
-              src={getFullUrl(img)}
-              alt={`Sub ${idx + 1}`}
-              className="max-h-48 object-cover rounded shadow"
-            />
-          ))}
-        </div>
-      )} */}
 
       {blog.tags && blog.tags.length > 0 && (
         <div className="mb-6">
