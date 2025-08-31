@@ -1,5 +1,3 @@
-"""Service manager for database, Pinecone, and Gemini."""
-
 import os
 import time
 import sqlalchemy
@@ -10,8 +8,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from config import get_database_url
 
 class ServiceManager:
-    """Manages all services in one class."""
-    
     def __init__(self):
         self.db_engine = None
         self.pinecone_client = None
@@ -21,7 +17,6 @@ class ServiceManager:
         self.index_populated = False
         
     def initialize_all(self) -> bool:
-        """Initialize all services with detailed logging."""
         print("🚀 Starting service initialization...")
         
         try:
@@ -258,20 +253,20 @@ class ServiceManager:
         
         if not chunks:
             return f"""I couldn't find specific information about "{query}" in our blog database."""
-        
-        # Generate friendly response
-        system_prompt = """You are a professional assistant specialized in retrieving information from a blog database.
+        with open("system_prompt.txt", "r", encoding="utf-8") as f:
+            system_prompt = f.read()
+#         system_prompt = """You are a professional assistant specialized in retrieving information from a blog database.
 
-BEHAVIOR RULES:
-- If user input is a greeting (hello, hi, hey, good morning), respond: "Hello! I can help you find information from our blog content. What would you like to know?"
-- If user input is thanks/farewell (thanks, thank you, bye, goodbye), respond: "You're welcome! Feel free to ask more questions."
-- If user input asks what you can do, respond: "I can search and analyze our blog database to answer your questions. What topic interests you?"
-- For all other inputs, search the provided content and give concise answers
-- If no relevant content is provided or found, say: "I don't have information about that topic in our current blog database."
-- Keep all responses under 50 words
-- Use plain text only, no formatting
+# BEHAVIOR RULES:
+# - If user input is a greeting (hello, hi, hey, good morning), respond: "Hello! I can help you find information from our blog content. What would you like to know?"
+# - If user input is thanks/farewell (thanks, thank you, bye, goodbye), respond: "You're welcome! Feel free to ask more questions."
+# - If user input asks what you can do, respond: "I can search and analyze our blog database to answer your questions. What topic interests you?"
+# - For all other inputs, search the provided content and give concise answers
+# - If no relevant content is provided or found, say: "I don't have information about that topic in our current blog database."
+# - Keep all responses under 50 words
+# - Use plain text only, no formatting
 
-IMPORTANT: Always check if the input is conversational first before searching content."""
+# IMPORTANT: Always check if the input is conversational first before searching content."""
 
         context = "\n\n".join(chunks)
         user_prompt = f"""BLOG CONTENT:

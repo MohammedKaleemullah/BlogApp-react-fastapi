@@ -1,5 +1,3 @@
-"""API routes for the RAG + Image generation service."""
-
 import time
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, UploadFile, File
@@ -9,18 +7,13 @@ from models import *
 from image_utils import make_pollinations_prompt, generate_image
 from config import UPLOAD_DIR, ALLOWED_EXTENSIONS
 
-# Create router
 router = APIRouter()
-
-# Global service manager (will be set from main.py)
 service_manager = None
 
 def set_service_manager(sm):
-    """Set the service manager instance."""
     global service_manager
     service_manager = sm
 
-# Basic endpoints
 @router.get("/")
 async def root():
     return {
@@ -45,7 +38,6 @@ async def test():
         "timestamp": time.time()
     }
 
-# RAG Endpoints
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
     if not service_manager:
@@ -118,7 +110,6 @@ async def query_rag(request: QueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
 
-# Image Generation Endpoints
 @router.post("/generate", response_model=PromptResponse)
 async def generate(req: PromptRequest):
     try:

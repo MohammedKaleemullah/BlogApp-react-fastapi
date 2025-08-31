@@ -1,5 +1,3 @@
-"""Image generation utilities."""
-
 import time
 import urllib.parse
 import requests
@@ -10,7 +8,6 @@ from fastapi import HTTPException
 from config import gemini_model, UPLOAD_DIR, MODELS
 
 def make_pollinations_prompt(user_input: str) -> tuple[str, str]:
-    """Use Gemini to generate Pollinations prompt + summary, with fallback."""
     if not gemini_model:
         return user_input[:50], user_input
         
@@ -44,11 +41,11 @@ def make_pollinations_prompt(user_input: str) -> tuple[str, str]:
                 if "summary" in result and "prompt" in result:
                     return result["summary"], result["prompt"]
 
-        print("⚠️ Gemini failed to produce JSON, falling back to raw input.")
+        print("Gemini failed to produce JSON, falling back to raw input.")
         return user_input[:50], user_input
 
     except Exception as e:
-        print(f"❌ Gemini error: {e}, falling back to raw input.")
+        print(f"Gemini error: {e}, falling back to raw input.")
         return user_input[:50], user_input
 
 def generate_image(prompt: str, width: int, height: int, seed: int, retries: int = 5) -> str:

@@ -9,7 +9,7 @@ const ImageSelector = ({
   setPrompt,
   generatedImage,
   generateImage,
-  loading, // <-- use this prop for generate button
+  loading,
 }) => {
   return (
     <div>

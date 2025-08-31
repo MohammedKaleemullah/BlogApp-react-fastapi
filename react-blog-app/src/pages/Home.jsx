@@ -36,7 +36,6 @@ export default function Home({ searchQuery }) {
 
   const filteredBlogs = items.filter(
     (blog) =>
-      // blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       // blog.content.toLowerCase().includes(searchQuery.toLowerCase())
       blog.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
       blog.title.toLowerCase().includes(searchQuery.toLowerCase())

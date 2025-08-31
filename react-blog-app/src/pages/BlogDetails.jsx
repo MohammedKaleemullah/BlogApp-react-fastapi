@@ -58,7 +58,7 @@ export default function BlogDetails() {
           ⚠ This blog has been marked as deleted.
         </div>
       )}
-      
+
       <div className="mb-6">
         {blog.main_image_url && blog.main_image_url !== "string" && (
           <img
@@ -71,8 +71,7 @@ export default function BlogDetails() {
         <div className="prose max-w-none text-gray-800 whitespace-pre-line text-justify">
           {blog.content}
         </div>
-        
-        {/* Clear float */}
+
         <div className="clear-both"></div>
       </div>
 
