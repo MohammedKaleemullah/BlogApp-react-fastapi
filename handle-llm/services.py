@@ -255,19 +255,6 @@ class ServiceManager:
             return f"""I couldn't find specific information about "{query}" in our blog database."""
         with open("system_prompt.txt", "r", encoding="utf-8") as f:
             system_prompt = f.read()
-#         system_prompt = """You are a professional assistant specialized in retrieving information from a blog database.
-
-# BEHAVIOR RULES:
-# - If user input is a greeting (hello, hi, hey, good morning), respond: "Hello! I can help you find information from our blog content. What would you like to know?"
-# - If user input is thanks/farewell (thanks, thank you, bye, goodbye), respond: "You're welcome! Feel free to ask more questions."
-# - If user input asks what you can do, respond: "I can search and analyze our blog database to answer your questions. What topic interests you?"
-# - For all other inputs, search the provided content and give concise answers
-# - If no relevant content is provided or found, say: "I don't have information about that topic in our current blog database."
-# - Keep all responses under 50 words
-# - Use plain text only, no formatting
-
-# IMPORTANT: Always check if the input is conversational first before searching content."""
-
         context = "\n\n".join(chunks)
         user_prompt = f"""BLOG CONTENT:
 {context}
