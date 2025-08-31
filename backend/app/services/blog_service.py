@@ -21,8 +21,11 @@ def is_valid_image_url(url: Optional[str]) -> bool:
 def create_blog(db: Session, blog_data: BlogCreate, user_id: uuid.UUID) -> Blog:
 
     clean_content = sanitize_html(blog_data.content)
-
+    # print("SEEEEE HEREEEE")
+    # print(blog_data.main_image_url)
+    # exit()
     if not is_valid_image_url(blog_data.main_image_url):
+
         raise ValueError("Invalid main image URL")
 
     if blog_data.sub_images:

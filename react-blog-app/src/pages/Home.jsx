@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogs } from "@/store/slices/blogSlice";
 import { Link } from "react-router-dom";
+import AssistantChat from "@/components/AssistantChat";
+
 
 export default function Home({ searchQuery }) {
   const dispatch = useDispatch();
@@ -78,6 +80,8 @@ export default function Home({ searchQuery }) {
       {!hasMore && !loading && (
         <div className="text-center text-gray-500 py-4">No more blogs</div>
       )}
+
+      <AssistantChat />
     </div>
   );
 }
