@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { ToastModal } from "@/components/ToastModal"; // ✅ Import toast
+import { ToastModal } from "@/components/ToastModal";
 
 const API_BASE = "http://127.0.0.1:8000";
 const LLM_API_BASE = "http://127.0.0.1:8005";
@@ -73,7 +73,7 @@ export default function BlogDetails() {
       }
 
       // Show success toast
-      setToastMessage("Blog deleted successfully! 🗑️");
+      setToastMessage("Blog deleted successfully!");
       setToastType("success");
       setIsConfirmation(false);
       setShowToast(true);
@@ -184,7 +184,7 @@ export default function BlogDetails() {
                 Deleting...
               </div>
             ) : (
-              "🗑️ Delete Blog"
+              "Delete Blog"
             )}
           </button>
         )}
