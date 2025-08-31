@@ -6,6 +6,7 @@ import axios from "axios";
 import TextInput from "@/components/TextInput";
 import TextAreaInput from "@/components/TextAreaInput";
 import ImageSelector from "@/components/ImageSelector";
+import { ToastModal } from "@/components/ToastModal"; // ✅ Import toast
 
 const API_BASE = "http://127.0.0.1:8000";
 const LLM_API_BASE = "http://127.0.0.1:8005";
@@ -27,6 +28,11 @@ const CreatePost = () => {
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const [error, setError] = useState(null);
   const [touched, setTouched] = useState({ title: false, content: false });
+
+  // ✅ Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
 
   const uploadImage = async (file) => {
     const formData = new FormData();
@@ -66,7 +72,7 @@ const CreatePost = () => {
 
       const tagsArray = tags.split(",").map((t) => t.trim()).filter(Boolean);
 
-      await axios.post(
+      const response = await axios.post(
         `${API_BASE}/blogs`,
         {
           title,
@@ -79,8 +85,20 @@ const CreatePost = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Blog created successfully!");
-      navigate("/");
+      const blogId = response.data.id || response.data.blog_id;
+
+      try {
+        await axios.post(`${LLM_API_BASE}/update-blog/${blogId}`);
+        console.log("✅ Blog indexed in RAG system");
+      } catch (ragError) {
+        console.warn("⚠️ RAG indexing failed:", ragError.message);
+      }
+
+      setToastMessage("Blog created successfully!");
+      setToastType("success");
+      setShowToast(true);
+
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       setError(err.response?.data?.detail || err.message);
     } finally {
@@ -111,7 +129,6 @@ const CreatePost = () => {
           maxWords={3000}
         />
 
-        {/* Visibility */}
         <div>
           <label className="block font-semibold mb-1">Visibility</label>
           <select
@@ -126,7 +143,6 @@ const CreatePost = () => {
           </select>
         </div>
 
-        {/* Tags */}
         <div>
           <label className="block font-semibold mb-1">Tags (comma separated)</label>
           <input
@@ -138,7 +154,6 @@ const CreatePost = () => {
           />
         </div>
 
-        {/* Image Selector */}
         <ImageSelector
           imageMode={imageMode}
           setImageMode={setImageMode}
@@ -148,33 +163,40 @@ const CreatePost = () => {
           setPrompt={setPrompt}
           generatedImage={generatedImage}
           generateImage={generateImage}
-          loading={loadingGenerate} // pass only generate loading
+          loading={loadingGenerate}
         />
 
         {error && <div className="text-red-600">{error}</div>}
 
-        {/* Submit Button */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={loadingSubmit}
-                className={`w-full py-4 rounded-xl text-white font-semibold text-lg shadow-lg transition-all duration-200 transform ${
-                  loadingSubmit
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-800 hover:to-gray-600 hover:scale-105 hover:shadow-xl"
-                }`}
-              >
-                {loadingSubmit ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Creating Your Blog...
-                  </div>
-                ) : (
-                  "Create Blog ✨"
-                )}
-              </button>
-            </div>
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={loadingSubmit}
+            className={`w-full py-4 rounded-xl text-white font-semibold text-lg shadow-lg transition-all duration-200 transform ${
+              loadingSubmit
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-800 hover:to-gray-600 hover:scale-105 hover:shadow-xl"
+            }`}
+          >
+            {loadingSubmit ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Creating Your Blog...
+              </div>
+            ) : (
+              "Create Blog ✨"
+            )}
+          </button>
+        </div>
       </form>
+
+      {showToast && (
+        <ToastModal
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };

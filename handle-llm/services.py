@@ -278,6 +278,106 @@ If information is limited, clearly indicate what additional details would be hel
             return response.candidates[0].content.parts[0].text
         else:
             return "I'm having trouble generating a response right now. Please try again!!!"
+        
+    def update_blog_in_index(self, blog_id: str, chunk_size: int = 1000):
+        """Update a specific blog in the Pinecone index."""
+        if not self.services_initialized:
+            raise RuntimeError("Services not initialized")
+        
+        print(f"🔄 Updating blog {blog_id} in index...")
+
+        blog = self.fetch_single_blog(blog_id)
+        if not blog or not blog["content"]:
+            print(f"⚠️ Blog {blog_id} not found or has no content")
+            return {"updated": False, "reason": "Blog not found or empty"}
+
+        self.delete_blog_from_index(blog_id)
+        
+        result = self.index_single_blog(blog, chunk_size)
+        print(f"✅ Updated blog {blog_id}: {result['chunks_count']} chunks")
+        
+        return result
+
+    def delete_blog_from_index(self, blog_id: str):
+        """Delete all chunks for a specific blog from Pinecone."""
+        if not self.services_initialized:
+            raise RuntimeError("Services not initialized")
+        
+        try:
+            index = self.pinecone_client.Index(self.index_name)
+
+            index.delete(filter={"blog_id": {"$eq": str(blog_id)}})
+            print(f"🗑️ Deleted all chunks for blog {blog_id}")
+            
+        except Exception as e:
+            print(f"⚠️ Error deleting blog {blog_id} chunks: {e}")
+
+    def fetch_single_blog(self, blog_id: int):
+        """Fetch a single blog by ID."""
+        if not self.db_engine:
+            raise RuntimeError("Database not connected")
+        
+        with self.db_engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT id, title, content FROM blogapp_schema.blog WHERE id = :blog_id"),
+                {"blog_id": blog_id}
+            )
+            row = result.fetchone()
+            
+            if row and row[2] and len(row[2].strip()) > 50:
+                return {"id": row[0], "title": row[1], "content": row[2]}
+            return None
+
+    def index_single_blog(self, blog: dict, chunk_size: int = 1000):
+        """Index a single blog into Pinecone."""
+        if not blog["content"]:
+            return {"chunks_count": 0}
+
+        full_content = f"Title: {blog['title']}\n\nContent: {blog['content']}"
+        chunks = self.chunk_text(full_content, chunk_size)
+        
+        vectors = []
+        for i, chunk in enumerate(chunks):
+            try:
+                embedding = self.embed_text(chunk)
+                vectors.append({
+                    "id": f"blog_{blog['id']}_chunk_{i}",
+                    "values": embedding,
+                    "metadata": {
+                        "text": chunk,
+                        "blog_id": str(blog['id']),
+                        "blog_title": blog['title'],
+                        "chunk_index": i,
+                        "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                })
+            except Exception as e:
+                print(f"⚠️ Failed to embed chunk {i} from blog {blog['id']}: {e}")
+                continue
+        
+        # Upsert to Pinecone
+        if vectors:
+            index = self.pinecone_client.Index(self.index_name)
+            
+            # Batch upsert
+            batch_size = 50
+            for i in range(0, len(vectors), batch_size):
+                batch = vectors[i:i + batch_size]
+                try:
+                    index.upsert(vectors=batch)
+                except Exception as e:
+                    print(f"⚠️ Failed to upsert batch: {e}")
+            
+            # Wait for indexing
+            time.sleep(2)
+        
+        return {"chunks_count": len(vectors)}
+
+    def handle_blog_deletion(self, blog_id: int):
+        """Handle blog deletion by removing from index."""
+        self.delete_blog_from_index(blog_id)
+        return {"deleted": True, "blog_id": blog_id}
+
     
     def cleanup(self):
         """Cleanup resources."""
